@@ -1,0 +1,9 @@
+.nyc_output
+ci
+test
+.env
+.eslintrc.js
+CONTRIBUTING.md
+LICENSE.md
+README.md
+sample.env

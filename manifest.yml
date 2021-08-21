@@ -1,0 +1,17 @@
+applications:
+- name: pages-mailer
+  routes:
+  - route: pages-mailer.apps.internal
+  services:
+  - auth
+  - smtp
+  buildpacks:
+  - nodejs_buildpack
+  instances: 2
+  memory: 256MB
+  health-check-type: http
+  health-check-http-endpoint: /health
+  env:
+    FROM: no-reply@gsa.gov
+    HOST: "0.0.0.0"
+    TRANSPORT: smtp

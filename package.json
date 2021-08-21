@@ -1,0 +1,39 @@
+{
+  "name": "pages-mailer",
+  "version": "0.0.1",
+  "description": "Send Emails",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "npx nodemon -r dotenv/config src/index.js",
+    "lint": "eslint src",
+    "test": "tap -R spec",
+    "test:cov": "tap -- --coverage-report=lcov",
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "david.corwin@gsa.gov",
+  "license": "CC0-1.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cloud-gov/pages-mailer.git"
+  },
+  "engines": {
+    "node": "16.5.x",
+    "npm": "7.x.x"
+  },
+  "type": "module",
+  "dependencies": {
+    "fastify": "^3.20.2",
+    "fastify-basic-auth": "^2.1.0",
+    "fastify-plugin": "^3.0.0",
+    "nodemailer": "^6.6.3",
+    "nodemailer-html-to-text": "^3.2.0"
+  },
+  "devDependencies": {
+    "dotenv": "^10.0.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.24.1",
+    "tap": "^15.0.9"
+  }
+}

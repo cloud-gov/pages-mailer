@@ -1,0 +1,229 @@
+############################
+#  SHARED
+
+email-cf: &email-cf
+  CF_API: https://api.fr.cloud.gov
+  CF_USERNAME: ((email-cf-username))
+  CF_PASSWORD: ((email-cf-password))
+  CF_ORG: gsa-18f-federalist
+  CF_SPACE: email
+  CF_APP_NAME: pages-mailer
+
+node-image: &node-image
+  type: docker-image
+  source:
+    repository: node
+    tag: 16.5
+
+cf-image: &cf-image
+  platform: linux
+  image_resource:
+    type: docker-image
+    source:
+      repository: 18fgsa/concourse-task
+
+test: &test
+- task: install-deps
+  config:
+    platform: linux
+    image_resource:
+      <<: *node-image
+    inputs: [name: src]
+    outputs: [name: src]
+    run:
+      dir: src
+      path: bash
+      args: [-c, npm ci]
+
+- in_parallel:
+  - task: test
+    config:
+      platform: linux
+      image_resource:
+        <<: *node-image
+      inputs: [name: src]
+      outputs: [name: src]
+      run:
+        dir: src
+        path: bash
+        args: [-c, npm test]
+
+  - task: lint
+    config:
+      platform: linux
+      image_resource:
+        <<: *node-image
+      inputs: [name: src]
+      outputs: [name: src]
+      run:
+        dir: src
+        path: bash
+        args: [-c, npm run lint]
+
+
+############################
+#  JOBS
+
+jobs:
+
+- name: test
+  plan:
+  - get: src
+    resource: pr
+    trigger: true
+    version: every
+
+  - put: src
+    resource: pr
+    params:
+      path: src
+      status: pending
+      base_context: concourse
+      context: test
+
+  - do: *test
+
+  on_failure:
+    put: src
+    resource: pr
+    params:
+      path: src
+      status: failure
+      base_context: concourse
+      context: test
+
+  on_success:
+    put: src
+    resource: pr
+    params:
+      path: src
+      status: success
+      base_context: concourse
+      context: test
+
+- name: deploy
+  plan:
+  - get: src
+    resource: src
+    trigger: true
+    params: {depth: 1}
+
+  - do: *test
+
+  - task: deploy
+    config:
+      <<: *cf-image
+      inputs: [name: src]
+      run:
+        dir: src
+        path: ci/tasks/deploy.sh
+    params:
+      <<: *email-cf
+      
+    on_failure:
+      try:
+        task: cancel-deployment
+        config:
+          <<: *cf-image
+          inputs: [name: src]
+          run:
+            dir: src
+            path: ci/tasks/cancel-deployment.sh
+        params:
+          <<: *email-cf
+
+  on_failure:
+    put: slack
+    params:
+      text: |
+        :x: FAILED: pages mailer deployment
+        <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+        ((slack-users))
+      channel: ((slack-channel))
+      username: ((slack-username))
+      icon_url: ((slack-icon-url))
+
+  on_success:
+    put: slack
+    params:
+      text: |
+        :white_check_mark: SUCCESS: Successfully deployed pages mailer
+        <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+        ((slack-users))
+      channel: ((slack-channel))
+      username: ((slack-username))
+      icon_url: ((slack-icon-url))
+
+
+- name: restage
+  plan:
+  - get: src
+    resource: src
+    params: {depth: 1}
+  - get: nightly
+    trigger: true
+
+  - task: restage
+    config:
+      inputs: [name: src]
+      <<: *cf-image
+      run:
+        path: src/ci/tasks/restage.sh
+    params:
+      <<: *email-cf
+
+############################
+#  RESOURCES
+
+resources:
+
+  - name: pr
+    type: pull-request
+    check_every: 1m
+    source:
+      repository: cloud-gov/pages-mailer
+      access_token: ((gh-access-token))
+      base_branch: main
+      disable_forks: true
+      ignore_drafts: false
+
+  - name: src
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/cloud-gov/pages-mailer   
+      branch: main
+
+  - name: nightly
+    type: time
+    source:
+      start: 12:00 AM
+      stop: 1:00 AM
+      location: America/New_York
+  
+  - name: slack
+    type: slack-notification
+    source:
+      url: ((slack-webhook-url))
+
+
+############################
+#  RESOURCE TYPES
+
+resource_types:
+
+  - name: cogito
+    type: docker-image
+    check_every: 24h
+    source:
+      repository: pix4d/cogito
+
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
+
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource
