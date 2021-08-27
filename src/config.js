@@ -1,6 +1,10 @@
+import fs from 'fs';
+
 const {
   AUTH_USERNAME,
   AUTH_PASSWORD,
+  CF_INSTANCE_CERT,
+  CF_INSTANCE_KEY,
   FROM,
   HOST,
   PORT,
@@ -18,6 +22,13 @@ export const auth = {
 };
 
 export const host = HOST;
+
+export const https = CF_INSTANCE_CERT
+  ? {
+    cert: fs.readFileSync(CF_INSTANCE_CERT),
+    key: fs.readFileSync(CF_INSTANCE_KEY),
+  }
+  : null;
 
 export const port = PORT;
 
@@ -43,5 +54,5 @@ export const mailer = TRANSPORT === 'smtp'
   };
 
 export default {
-  auth, host, mailer, port,
+  auth, host, https, mailer, port,
 };

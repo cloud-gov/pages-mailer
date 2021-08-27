@@ -9,8 +9,7 @@ applications:
   - nodejs_buildpack
   instances: 2
   memory: 256MB
-  health-check-type: http
-  health-check-http-endpoint: /health
+  health-check-type: port
   env:
     FROM: no-reply@gsa.gov
     HOST: "0.0.0.0"

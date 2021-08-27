@@ -1,9 +1,10 @@
 import app from './app.js';
-import config, { host, port } from './config.js';
+import config, { host, https, port } from './config.js';
 
 const start = async () => {
   const server = await app({
     config,
+    https,
     logger: true,
   });
 
