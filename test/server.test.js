@@ -85,7 +85,52 @@ tap.test('POST `/send` without required property', async (t) => {
   t.same(response.json(), { statusCode: status, ...message }, JSON.stringify(message));
 });
 
-tap.test('POST `/send`', async (t) => {
+tap.test('POST `/send to all recipient types`', async (t) => {
+  const status = 200;
+  const message = { message: 'email sent' };
+
+  const server = await app(opts);
+
+  const response = await server.inject({
+    method: 'POST',
+    url: '/send',
+    headers: { ...authHeader },
+    payload: {
+      html: '<h1>Hello World</h1>',
+      subject: 'test',
+      to: ['foo@bar.com'],
+      cc: ['foo-cc@bar.com'],
+      bcc: ['foo-bcc@bar.com'],
+    },
+  });
+
+  t.equal(response.statusCode, status, `status: ${status}`);
+  t.same(response.json(), message, JSON.stringify(message));
+});
+
+tap.test('POST `/send to > 1 recipient types`', async (t) => {
+  const status = 200;
+  const message = { message: 'email sent' };
+
+  const server = await app(opts);
+
+  const response = await server.inject({
+    method: 'POST',
+    url: '/send',
+    headers: { ...authHeader },
+    payload: {
+      html: '<h1>Hello World</h1>',
+      subject: 'test',
+      to: ['foo@bar.com'],
+      cc: ['foo-cc@bar.com'],
+    },
+  });
+
+  t.equal(response.statusCode, status, `status: ${status}`);
+  t.same(response.json(), message, JSON.stringify(message));
+});
+
+tap.test('POST `/send to`', async (t) => {
   const status = 200;
   const message = { message: 'email sent' };
 
@@ -104,4 +149,68 @@ tap.test('POST `/send`', async (t) => {
 
   t.equal(response.statusCode, status, `status: ${status}`);
   t.same(response.json(), message, JSON.stringify(message));
+});
+
+tap.test('POST `/send cc`', async (t) => {
+  const status = 200;
+  const message = { message: 'email sent' };
+
+  const server = await app(opts);
+
+  const response = await server.inject({
+    method: 'POST',
+    url: '/send',
+    headers: { ...authHeader },
+    payload: {
+      html: '<h1>Hello World</h1>',
+      subject: 'test',
+      cc: ['foo@bar.com'],
+    },
+  });
+
+  t.equal(response.statusCode, status, `status: ${status}`);
+  t.same(response.json(), message, JSON.stringify(message));
+});
+
+tap.test('POST `/send bcc`', async (t) => {
+  const status = 200;
+  const message = { message: 'email sent' };
+
+  const server = await app(opts);
+
+  const response = await server.inject({
+    method: 'POST',
+    url: '/send',
+    headers: { ...authHeader },
+    payload: {
+      html: '<h1>Hello World</h1>',
+      subject: 'test',
+      bcc: ['foo@bar.com'],
+    },
+  });
+
+  t.equal(response.statusCode, status, `status: ${status}`);
+  t.same(response.json(), message, JSON.stringify(message));
+});
+
+tap.test('POST `/send without recipients`', async (t) => {
+  const status = 400;
+  const message = {
+    error: 'Bad Request',
+    message: 'body should have required property \'.to\', body should have required property \'.cc\', body should have required property \'.bcc\', body should match some schema in anyOf',
+  };
+  const server = await app(opts);
+
+  const response = await server.inject({
+    method: 'POST',
+    url: '/send',
+    headers: { ...authHeader },
+    payload: {
+      html: '<h1>Hello World</h1>',
+      subject: 'test',
+    },
+  });
+
+  t.equal(response.statusCode, status, `status: ${status}`);
+  t.same(response.json(), { statusCode: status, ...message }, JSON.stringify(message));
 });
