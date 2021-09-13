@@ -20,8 +20,12 @@ export default {
     },
   },
   async handler(request) {
-    const { html, subject, to, cc, bcc } = request.body;
-    const { message } = await this.mailer.send({ html, subject, to, cc, bcc });
+    const {
+      html, subject, to, cc, bcc,
+    } = request.body;
+    const { message } = await this.mailer.send({
+      html, subject, to, cc, bcc,
+    });
     this.log.info(message);
     return { message: 'email sent' };
   },
