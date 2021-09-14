@@ -15,8 +15,12 @@ class Mailer {
     return this.transporter.close();
   }
 
-  send({ to, subject, html }) {
-    return this.transporter.sendMail({ to, subject, html });
+  send({
+    to, subject, html, cc, bcc,
+  }) {
+    return this.transporter.sendMail({
+      to, subject, html, cc, bcc,
+    });
   }
 
   verify() {
