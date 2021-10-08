@@ -42,6 +42,8 @@ The application can be configured via the following environment variables:
 | ---------------------------------|-------------------------------------------------------------|
 | AUTH_USERNAME                    | Basic authentication username                               |
 | AUTH_PASSWORD                    | Basic authentication password                               |
+| CF_INSTANCE_CERT                 | SSL Certificate (optional to support ssl)                   |
+| CF_INSTANCE_KEY                  | SSL Certificate Key (optional to support ssl)               |
 | FROM                             | Email address to send emails from                           |
 | HOST                             | Host for the http server                                    |
 | PORT                             | Port for the http server                                    |
