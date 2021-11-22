@@ -1,6 +1,6 @@
 [![CodeQL](https://github.com/cloud-gov/pages-mailer/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/cloud-gov/pages-mailer/actions/workflows/codeql-analysis.yml)
 
-# Pages Mailer
+# Pages Mailer - Test PR
 
 An HTTP interface to send emails using an internal SMTP server.
 
