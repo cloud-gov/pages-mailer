@@ -154,7 +154,6 @@ jobs:
       username: ((slack-username))
       icon_url: ((slack-icon-url))
 
-
 - name: restage
   plan:
   - get: src
@@ -172,15 +171,15 @@ jobs:
     params:
       <<: *email-cf
 
-  - name: reconfigure
-    serial: true
-    plan:
-      - get: src
-        resource: src
-        params: {depth: 1}
-        trigger: true
-      - set_pipeline: mailer
-        file: ci/pipeline.yml
+- name: reconfigure
+  serial: true
+  plan:
+    - get: src
+      resource: src
+      params: {depth: 1}
+      trigger: true
+    - set_pipeline: mailer
+      file: ci/pipeline.yml
 
 
 ############################
