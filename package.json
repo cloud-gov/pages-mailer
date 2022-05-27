@@ -23,17 +23,17 @@
   },
   "type": "module",
   "dependencies": {
-    "fastify": "^3.20.2",
-    "fastify-basic-auth": "^2.1.0",
-    "fastify-plugin": "^3.0.0",
-    "nodemailer": "^6.6.3",
+    "fastify": "^3.29.0",
+    "fastify-basic-auth": "^2.3.0",
+    "fastify-plugin": "^3.0.1",
+    "nodemailer": "^6.7.5",
     "nodemailer-html-to-text": "^3.2.0"
   },
   "devDependencies": {
-    "dotenv": "^10.0.0",
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.24.1",
-    "tap": "^15.0.9"
+    "dotenv": "^16.0.1",
+    "eslint": "^8.16.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "tap": "^16.2.0"
   }
 }
