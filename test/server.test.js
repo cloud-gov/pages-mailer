@@ -6,10 +6,8 @@ const username = 'user';
 const password = 'pass';
 
 const opts = {
-  config: {
-    auth: { username, password },
-    mailer: { from: 'test@example.gov', jsonTransport: true },
-  },
+  auth: { username, password },
+  mailer: { from: 'test@example.gov', jsonTransport: true },
 };
 
 const authHeader = {

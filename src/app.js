@@ -1,12 +1,13 @@
 import fastify from 'fastify';
+import fastifyBasicAuth from '@fastify/basic-auth';
 
 import { auth, mailer } from './plugins/index.js';
 import { healthCheck, send } from './routes/index.js';
 
-async function build({ config, ...fastifyOpts } = {}) {
-  const app = fastify(fastifyOpts);
+async function build(config = {}) {
+  const app = fastify(config.fastify);
 
-  app.register(auth, { config: config.auth });
+  app.register(fastifyBasicAuth, { validate: auth(config.auth) });
   app.register(mailer, { config: config.mailer });
   app.setErrorHandler((err, req, reply) => {
     if (err.statusCode === 401) {

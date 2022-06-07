@@ -3,6 +3,7 @@ const {
   AUTH_PASSWORD,
   FROM,
   HOST,
+  NODE_ENV,
   PORT,
   SMTP_CERT,
   SMTP_HOST,
@@ -42,6 +43,15 @@ export const mailer = TRANSPORT === 'smtp'
     jsonTransport: true,
   };
 
-export default {
-  auth, host, mailer, port,
+export const fastify = {
+  logger: NODE_ENV === 'production'
+    ? {
+      base: undefined,
+    }
+    : {
+      prettyPrint: {
+        translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
+        ignore: 'pid,hostname',
+      },
+    },
 };
