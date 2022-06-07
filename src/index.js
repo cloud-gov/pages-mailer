@@ -1,11 +1,10 @@
 import app from './app.js';
-import config, { host, port } from './config.js';
+import {
+  auth, fastify, host, mailer, port,
+} from './config.js';
 
 const start = async () => {
-  const server = await app({
-    config,
-    logger: true,
-  });
+  const server = await app({ auth, fastify, mailer });
 
   try {
     await server.ready();
