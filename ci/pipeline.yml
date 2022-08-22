@@ -106,6 +106,7 @@ jobs:
   - get: src
     resource: src
     trigger: true
+    passed: [set-pipeline]
     params: {depth: 1}
 
   - do: *test
@@ -156,6 +157,7 @@ jobs:
   plan:
   - get: src
     resource: src
+    passed: [set-pipeline]
     params: {depth: 1}
   - get: nightly
     trigger: true
