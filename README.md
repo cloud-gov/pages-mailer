@@ -75,7 +75,7 @@ concourse configuration files in [the `ci/` directory](/ci).
 ## Development
 
 ### Requirements
-- `node 16.8`
+- `node 18.17`
 - `npm 7.x`
 
 ### Get Started
