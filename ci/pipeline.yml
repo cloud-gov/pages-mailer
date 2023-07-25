@@ -8,6 +8,7 @@ email-cf: &email-cf
   CF_ORG: gsa-18f-federalist
   CF_SPACE: email
   CF_APP_NAME: pages-mailer
+  CF_STACK: cflinuxfs4
 
 node-image: &node-image
   type: docker-image
