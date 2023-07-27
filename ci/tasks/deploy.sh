@@ -9,5 +9,4 @@ cf t -o $CF_ORG -s $CF_SPACE
 
 cf push $CF_APP_NAME \
 --strategy rolling \
---vars-file $CF_VARS_FILE \
 --stack $CF_STACK
