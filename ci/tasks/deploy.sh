@@ -7,4 +7,6 @@ cf auth
 
 cf t -o $CF_ORG -s $CF_SPACE
 
-cf push $CF_APP_NAME --strategy rolling
+cf push $CF_APP_NAME \
+--strategy rolling \
+--stack $CF_STACK
