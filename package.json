@@ -18,23 +18,22 @@
     "url": "git://github.com/cloud-gov/pages-mailer.git"
   },
   "engines": {
-    "node": "^18.x.x",
-    "npm": "^8.x.x"
+    "node": "^18.x.x"
   },
   "type": "module",
   "dependencies": {
-    "@fastify/basic-auth": "^3.0.2",
-    "fastify": "^3.29.0",
-    "fastify-plugin": "^3.0.1",
-    "nodemailer": "^6.7.5",
+    "@fastify/basic-auth": "^5.0.0",
+    "fastify": "^4.21.0",
+    "fastify-plugin": "^4.5.1",
+    "nodemailer": "^6.9.4",
     "nodemailer-html-to-text": "^3.2.0"
   },
   "devDependencies": {
-    "dotenv": "^16.0.1",
-    "eslint": "^8.16.0",
+    "dotenv": "^16.3.1",
+    "eslint": "^8.45.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.26.0",
-    "pino-pretty": "6.0.0",
-    "tap": "^16.2.0"
+    "eslint-plugin-import": "^2.27.5",
+    "pino-pretty": "^10.2.0",
+    "tap": "^16.3.7"
   }
 }
