@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "npx nodemon -r dotenv/config src/index.js",
     "lint": "eslint src",
-    "test": "tap -R spec",
-    "test:cov": "tap -- --coverage-report=lcov",
+    "test": "vitest --no-watch --coverage",
     "start": "node src/index.js"
   },
   "keywords": [],
@@ -29,11 +28,12 @@
     "nodemailer-html-to-text": "^3.2.0"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^1.2.1",
     "dotenv": "^16.3.1",
     "eslint": "^8.45.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.27.5",
     "pino-pretty": "^10.2.0",
-    "tap": "^16.3.7"
+    "vitest": "^1.2.1"
   }
 }
