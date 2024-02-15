@@ -28,9 +28,9 @@ cf-image: &cf-image
     source:
       aws_access_key_id: ((ecr-aws-key))
       aws_secret_access_key: ((ecr-aws-secret))
-      repository: pages-dind-v25
+      repository: harden-concourse-task
       aws_region: us-gov-west-1
-      tag: latest
+      tag: ((harden-concourse-task-tag))
 
 test: &test
 - task: install-deps
