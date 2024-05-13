@@ -10,59 +10,19 @@ email-cf: &email-cf
   CF_APP_NAME: pages-mailer
   CF_STACK: cflinuxfs4
 
-node-image: &node-image
-  platform: linux
-  image_resource:
-    type: registry-image
-    source:
-      aws_access_key_id: ((ecr-aws-key))
-      aws_secret_access_key: ((ecr-aws-secret))
-      repository: pages-node-v20
-      aws_region: us-gov-west-1
-      tag: latest
-
-cf-image: &cf-image
-  platform: linux
-  image_resource:
-    type: registry-image
-    source:
-      aws_access_key_id: ((ecr-aws-key))
-      aws_secret_access_key: ((ecr-aws-secret))
-      repository: general-task
-      aws_region: us-gov-west-1
-      tag: latest
-
 test: &test
 - task: install-deps
-  config:
-    <<: *node-image
-    inputs: [name: src]
-    outputs: [name: src]
-    run:
-      dir: src
-      path: bash
-      args: [-c, npm ci]
+  image: node
+  file: src/ci/partials/install-deps.yml
 
 - in_parallel:
   - task: test
-    config:
-      <<: *node-image
-      inputs: [name: src]
-      outputs: [name: src]
-      run:
-        dir: src
-        path: bash
-        args: [-c, npm test]
+    image: node
+    file: src/ci/partials/test.yml
 
   - task: lint
-    config:
-      <<: *node-image
-      inputs: [name: src]
-      outputs: [name: src]
-      run:
-        dir: src
-        path: bash
-        args: [-c, npm run lint]
+    image: node
+    file: src/ci/partials/lint.yml
 
 
 ############################
@@ -84,6 +44,9 @@ jobs:
       status: pending
       base_context: concourse
       context: test
+
+  - get: node
+  - get: cf-image
 
   - do: *test
 
@@ -113,27 +76,22 @@ jobs:
     passed: [set-pipeline]
     params: {depth: 1}
 
+  - get: node
+  - get: cf-image
+
   - do: *test
 
   - task: deploy
-    config:
-      <<: *cf-image
-      inputs: [name: src]
-      run:
-        dir: src
-        path: ci/tasks/deploy.sh
+    image: cf-image
+    file: src/ci/partials/deploy.yml
     params:
       <<: *email-cf
 
     on_failure:
       try:
         task: cancel-deployment
-        config:
-          <<: *cf-image
-          inputs: [name: src]
-          run:
-            dir: src
-            path: ci/tasks/cancel-deployment.sh
+        image: cf-image
+        file: src/ci/partials/cancel-deployment.yml
         params:
           <<: *email-cf
 
@@ -163,15 +121,13 @@ jobs:
     resource: src
     passed: [set-pipeline]
     params: {depth: 1}
+  - get: cf-image
   - get: nightly
     trigger: true
 
   - task: restage
-    config:
-      inputs: [name: src]
-      <<: *cf-image
-      run:
-        path: src/ci/tasks/restage.sh
+    image: cf-image
+    file: src/ci/partials/restage.yml
     params:
       <<: *email-cf
 
@@ -220,6 +176,24 @@ resources:
     type: slack-notification
     source:
       url: ((slack-webhook-url))
+
+  - name: node
+    type: registry-image
+    source:
+      aws_access_key_id: ((ecr-aws-key))
+      aws_secret_access_key: ((ecr-aws-secret))
+      repository: pages-node-v20
+      aws_region: us-gov-west-1
+      tag: latest
+
+  - name: cf-image
+    type: registry-image
+    source:
+      aws_access_key_id: ((ecr-aws-key))
+      aws_secret_access_key: ((ecr-aws-secret))
+      repository: general-task
+      aws_region: us-gov-west-1
+      tag: latest
 
 
 ############################
