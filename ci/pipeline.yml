@@ -46,7 +46,7 @@ jobs:
       context: test
 
   - get: node
-  - get: cf-image
+  - get: general-task
 
   - do: *test
 
@@ -77,12 +77,13 @@ jobs:
     params: {depth: 1}
 
   - get: node
-  - get: cf-image
+  - get: general-task
+  - get: pipeline-tasks
 
   - do: *test
 
   - task: deploy
-    image: cf-image
+    image: general-task
     file: src/ci/partials/deploy.yml
     params:
       <<: *email-cf
@@ -90,8 +91,8 @@ jobs:
     on_failure:
       try:
         task: cancel-deployment
-        image: cf-image
-        file: src/ci/partials/cancel-deployment.yml
+        image: general-task
+        file: pipeline-tasks/tasks/cancel-deployment.yml
         params:
           <<: *email-cf
 
@@ -121,13 +122,14 @@ jobs:
     resource: src
     passed: [set-pipeline]
     params: {depth: 1}
-  - get: cf-image
+  - get: general-task
+  - get: pipeline-tasks
   - get: nightly
     trigger: true
 
   - task: restage
-    image: cf-image
-    file: src/ci/partials/restage.yml
+    image: general-task
+    file: pipeline-tasks/tasks/restage.yml
     params:
       <<: *email-cf
 
@@ -165,6 +167,12 @@ resources:
       branch: main
       commit_verification_keys: ((cloud-gov-pages-gpg-keys))
 
+  - name: pipeline-tasks
+    type: git
+    source:
+      uri: ((pipeline-tasks-git-url))
+      branch: main
+
   - name: nightly
     type: time
     source:
@@ -186,7 +194,7 @@ resources:
       aws_region: us-gov-west-1
       tag: latest
 
-  - name: cf-image
+  - name: general-task
     type: registry-image
     source:
       aws_access_key_id: ((ecr-aws-key))
@@ -200,6 +208,14 @@ resources:
 #  RESOURCE TYPES
 
 resource_types:
+  - name: git
+    type: registry-image
+    source:
+      aws_access_key_id: ((ecr_aws_key))
+      aws_secret_access_key: ((ecr_aws_secret))
+      repository: git-resource
+      aws_region: us-gov-west-1
+      tag: latest
 
   - name: pull-request
     type: registry-image
