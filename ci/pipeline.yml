@@ -147,7 +147,7 @@ jobs:
       params:
         PIPELINE_YML: src/ci/pipeline.yml
     - set_pipeline: mailer
-      file: src/set-pipeline.yml
+      file: compiled/set-pipeline.yml
 
 ############################
 #  RESOURCES
@@ -186,28 +186,8 @@ resources:
       location: America/New_York
 
   - name: slack
-    type: slack-notification
-    source:
-      url: ((slack-webhook-url))
-
   - name: node
-    type: registry-image
-    source:
-      aws_access_key_id: ((ecr-aws-key))
-      aws_secret_access_key: ((ecr-aws-secret))
-      repository: pages-node-v20
-      aws_region: us-gov-west-1
-      tag: latest
-
   - name: general-task
-    type: registry-image
-    source:
-      aws_access_key_id: ((ecr-aws-key))
-      aws_secret_access_key: ((ecr-aws-secret))
-      repository: general-task
-      aws_region: us-gov-west-1
-      tag: latest
-
 
 ############################
 #  RESOURCE TYPES
