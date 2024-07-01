@@ -1,51 +1,57 @@
+---
+#@ load("funcs.lib.yml", "slack_hook", "pr_hook")
+#@ load("@ytt:data", "data")
+#@ load("@ytt:template", "template")
+
+#@ env = data.values.env
+
 #! SHARED
 
-test: &test
-  - task: install-deps
-    image: node
-    file: src/ci/partials/install-deps.yml
+test: &test #!  JOBS
 
-  - in_parallel:
-      - task: test
-        image: node
-        file: src/ci/partials/test.yml
-
-      - task: lint
-        image: node
-        file: src/ci/partials/lint.yml
-
-#!  JOBS
 
 jobs:
   - name: test
     plan:
       - get: src
-        resource: pr
         trigger: true
-        version: every
-      - put: #@ pr_hook("pending", "test")
-
+        params:
+          #@ if/end env != 'test':
+          depth: 1
+          #@ if/end env == 'test':
+          integration_tool: checkout
+      #@ if/end env == 'test':
+      -  #@ pr_hook("pending", "test")
       - get: node
       - get: general-task
+      - task: install-deps
+        image: node
+        file: src/ci/partials/install-deps.yml
 
-      - do: *test
+      - in_parallel:
+          - task: test
+            image: node
+            file: src/ci/partials/test.yml
 
+          - task: lint
+            image: node
+            file: src/ci/partials/lint.yml
+
+    #@ if env == 'test':
     on_failure: #@ pr_hook("failure", "test")
     on_success: #@ pr_hook("success", "test")
+    #@ end
 
+  #@ if env == 'deploy':
   - name: deploy
     plan:
       - get: src
-        resource: src
         trigger: true
-        passed: [set-pipeline]
+        passed: [set-pipeline, test]
         params: { depth: 1 }
 
-      - get: node
       - get: general-task
       - get: pipeline-tasks
-
-      - do: *test
 
       - task: deploy
         image: general-task
@@ -69,7 +75,6 @@ jobs:
   - name: restage
     plan:
       - get: src
-        resource: src
         passed: [set-pipeline]
         params: { depth: 1 }
       - get: general-task
@@ -83,27 +88,35 @@ jobs:
         params:
           _: #@ template.replace(data.values.env_cf_email)
           CF_APP_NAME: pages-mailer
+  #@ end
 
   - name: set-pipeline
     serial: true
     plan:
       - get: src
-        params: { depth: 1 }
+        params:
+          #@ if/end env != 'test':
+          depth: 1
+          #@ if/end env == 'test':
+          integration_tool: checkout
         trigger: true
       - get: pipeline-tasks
       - get: general-task
-      - task: init
+      - task: boot
         image: general-task
-        file: pipeline-tasks/tasks/init.yml
+        file: pipeline-tasks/tasks/boot.yml
         params:
-          PIPELINE_YML: src/ci/pipeline.yml
-      - set_pipeline: mailer
+          ENV_OVERRIDE: src/ci/pipeline.yml
+      - set_pipeline: self
         file: compiled/set-pipeline.yml
+        instance_vars:
+          deploy-env: ((deploy-env))
 
 #!  RESOURCES
 
 resources:
-  - name: pr
+  #@ if/end env == 'test':
+  - name: src
     type: pull-request
     check_every: 1m
     source:
@@ -113,12 +126,13 @@ resources:
       disable_forks: true
       ignore_drafts: false
 
+  #@ if env == 'deploy':
   - name: src
     type: git
     icon: github
     source:
       uri: https://github.com/cloud-gov/pages-mailer
-      branch: main
+      branch: chore-ci-update
       commit_verification_keys: ((cloud-gov-pages-gpg-keys))
 
   - name: nightly
@@ -128,8 +142,10 @@ resources:
       stop: 1:00 AM
       location: America/New_York
 
-  - name: pipeline-tasks
   - name: slack
+  #@ end
+
+  - name: pipeline-tasks
   - name: node
   - name: general-task
 
@@ -137,7 +153,11 @@ resources:
 
 resource_types:
   - name: git
-  - name: pull-request
-  - name: slack-notification
-  - name: time
+
   - name: registry-image
+  #@ if env == 'deploy':
+  - name: time
+  - name: slack-notification
+  #@ end
+  #@ if/end env == 'test':
+  - name: pull-request
