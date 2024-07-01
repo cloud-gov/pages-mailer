@@ -1,3 +1,8 @@
+---
+#@ load("funcs.lib.yml", "slack_hook", "pr_hook")
+#@ load("@ytt:data", "data")
+#@ load("@ytt:template", "template")
+
 #! SHARED
 
 test: &test
