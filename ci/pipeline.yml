@@ -7,13 +7,34 @@
 
 #! SHARED
 
-test: &test #!  JOBS
-
+#!  JOBS
 
 jobs:
+  - name: set-pipeline
+    plan:
+      - get: src
+        params:
+          #@ if/end env != 'test':
+          depth: 1
+          #@ if/end env == 'test':
+          integration_tool: checkout
+        trigger: true
+      - get: pipeline-tasks
+      - get: general-task
+      - task: boot
+        image: general-task
+        file: pipeline-tasks/tasks/boot.yml
+        params:
+          ENV_OVERRIDE: ((deploy-env))
+      - set_pipeline: self
+        file: compiled/set-pipeline.yml
+        instance_vars:
+          deploy-env: ((deploy-env))
+
   - name: test
     plan:
       - get: src
+        passed: [set-pipeline]
         trigger: true
         params:
           #@ if/end env != 'test':
@@ -89,28 +110,6 @@ jobs:
           _: #@ template.replace(data.values.env_cf_email)
           CF_APP_NAME: pages-mailer
   #@ end
-
-  - name: set-pipeline
-    serial: true
-    plan:
-      - get: src
-        params:
-          #@ if/end env != 'test':
-          depth: 1
-          #@ if/end env == 'test':
-          integration_tool: checkout
-        trigger: true
-      - get: pipeline-tasks
-      - get: general-task
-      - task: boot
-        image: general-task
-        file: pipeline-tasks/tasks/boot.yml
-        params:
-          ENV_OVERRIDE: src/ci/pipeline.yml
-      - set_pipeline: self
-        file: compiled/set-pipeline.yml
-        instance_vars:
-          deploy-env: ((deploy-env))
 
 #!  RESOURCES
 
