@@ -145,7 +145,7 @@ resources:
   #@ end
 
   - name: pipeline-tasks
-  - name: node
+  - name: node22
   - name: general-task
 
 #!  RESOURCE TYPES
