@@ -43,19 +43,19 @@ jobs:
           integration_tool: checkout
       #@ if/end env == 'test':
       -  #@ pr_hook("pending", "test")
-      - get: node
+      - get: node22
       - get: general-task
       - task: install-deps
-        image: node
+        image: node22
         file: src/ci/partials/install-deps.yml
 
       - in_parallel:
           - task: test
-            image: node
+            image: node22
             file: src/ci/partials/test.yml
 
           - task: lint
-            image: node
+            image: node22
             file: src/ci/partials/lint.yml
 
     #@ if env == 'test':
