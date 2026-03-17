@@ -75,8 +75,8 @@ concourse configuration files in [the `ci/` directory](/ci).
 ## Development
 
 ### Requirements
-- `node 18.17`
-- `npm 7.x`
+- `node v24`
+- `npm v11`
 
 ### Get Started
 - `git clone git@github.com:cloud-gov/pages-mailer.git`
