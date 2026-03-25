@@ -22,7 +22,7 @@
   "type": "module",
   "dependencies": {
     "@fastify/basic-auth": "^6.2.0",
-    "fastify": "^5.8.2",
+    "fastify": "^5.8.3",
     "fastify-plugin": "^4.5.1",
     "nodemailer": "^7.0.11",
     "nodemailer-html-to-text": "^3.2.0"
