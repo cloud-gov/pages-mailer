@@ -43,19 +43,19 @@ jobs:
           integration_tool: checkout
       #@ if/end env == 'test':
       -  #@ pr_hook("pending", "test")
-      - get: node22
+      - get: node24
       - get: general-task
       - task: install-deps
-        image: node22
+        image: node24
         file: src/ci/partials/install-deps.yml
 
       - in_parallel:
           - task: test
-            image: node22
+            image: node24
             file: src/ci/partials/test.yml
 
           - task: lint
-            image: node22
+            image: node24
             file: src/ci/partials/lint.yml
 
     #@ if env == 'test':
@@ -145,7 +145,7 @@ resources:
   #@ end
 
   - name: pipeline-tasks
-  - name: node22
+  - name: node24
   - name: general-task
 
 #!  RESOURCE TYPES
